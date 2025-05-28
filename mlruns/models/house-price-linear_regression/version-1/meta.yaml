@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748405796397
+current_stage: None
+description: null
+last_updated_timestamp: 1748405796397
+name: house-price-linear_regression
+run_id: 27d75372b9bc4bc5acd8a6e3c424ae82
+run_link: null
+source: file:///home/eflores/Documents/vsc/Freelance/opt-pp-mlpipeline/house-price-ml-pipeline/mlruns/227010402872563828/27d75372b9bc4bc5acd8a6e3c424ae82/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/eflores/Documents/vsc/Freelance/opt-pp-mlpipeline/house-price-ml-pipeline/mlruns/227010402872563828/27d75372b9bc4bc5acd8a6e3c424ae82/artifacts/model
+user_id: null
+version: 1

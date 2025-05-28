@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748405793054
+current_stage: None
+description: null
+last_updated_timestamp: 1748405793054
+name: house-price-random_forest
+run_id: 66a09da79a6e41feb171e0a05580139f
+run_link: null
+source: file:///home/eflores/Documents/vsc/Freelance/opt-pp-mlpipeline/house-price-ml-pipeline/mlruns/227010402872563828/66a09da79a6e41feb171e0a05580139f/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///home/eflores/Documents/vsc/Freelance/opt-pp-mlpipeline/house-price-ml-pipeline/mlruns/227010402872563828/66a09da79a6e41feb171e0a05580139f/artifacts/model
+user_id: null
+version: 1
