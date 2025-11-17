@@ -226,3 +226,25 @@ credentials/
 # demo/*.png
 # demo/*.jpg
 # demo/*.gif
+
+# LocalStack
+localstack-data/
+.localstack/
+
+# CDK
+infrastructure/cdk.out/
+infrastructure/node_modules/
+infrastructure/*.js
+infrastructure/*.d.ts
+infrastructure/package-lock.json
+
+# But allow infrastructure TypeScript source files
+!infrastructure/lib/
+!infrastructure/bin/
+!infrastructure/lib/*.ts
+!infrastructure/bin/*.ts
+
+# Lambda layers (built artifacts)
+lambda-layers/ml-dependencies/python/
+lambda-layers/**/*.pyc
+lambda-layers/**/__pycache__/
