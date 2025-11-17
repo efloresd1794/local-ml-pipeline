@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML House Price Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 3px;
+            color: #999;
+            font-size: 0.8rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .preset-btn {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .preset-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .result-box {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .result-error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .result-info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+        }
+
+        .prediction-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .confidence-range {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .config-section {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .config-section input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .status-online {
+            background: #28a745;
+        }
+
+        .status-offline {
+            background: #dc3545;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            .presets {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .info-banner {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
+        .info-banner strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .health-status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 House Price Predictor</h1>
+            <p>ML-powered California Housing Price Prediction</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Panel: Input Form -->
+            <div class="card">
+                <h2>Property Details</h2>
+
+                <!-- API Configuration -->
+                <div class="config-section">
+                    <label for="apiUrl" style="font-weight: 600; margin-bottom: 5px; display: block;">API Endpoint:</label>
+                    <input type="text" id="apiUrl" placeholder="http://localhost:4566/restapis/{api-id}/prod/_user_request_">
+                    <button class="btn btn-secondary" style="margin-top: 10px; padding: 8px;" onclick="checkHealth()">
+                        Test Connection
+                    </button>
+                    <div id="healthStatus"></div>
+                </div>
+
+                <!-- Preset Examples -->
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 600; margin-bottom: 10px; display: block;">Quick Examples:</label>
+                    <div class="presets">
+                        <button class="preset-btn" onclick="loadPreset('luxury')">
+                            💎 Luxury SF
+                        </button>
+                        <button class="preset-btn" onclick="loadPreset('average')">
+                            🏡 Average LA
+                        </button>
+                        <button class="preset-btn" onclick="loadPreset('budget')">
+                            💰 Budget Valley
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <form id="predictionForm">
+                    <div class="feature-grid">
+                        <div class="form-group">
+                            <label for="medInc">Median Income</label>
+                            <input type="number" id="medInc" step="0.01" required>
+                            <small>In $10,000s (e.g., 8.3 = $83,000)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="houseAge">House Age</label>
+                            <input type="number" id="houseAge" step="1" required>
+                            <small>Median age in years</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aveRooms">Avg Rooms</label>
+                            <input type="number" id="aveRooms" step="0.1" required>
+                            <small>Average rooms per household</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aveBedrms">Avg Bedrooms</label>
+                            <input type="number" id="aveBedrms" step="0.1" required>
+                            <small>Average bedrooms per household</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="population">Population</label>
+                            <input type="number" id="population" step="1" required>
+                            <small>Block group population</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="aveOccup">Avg Occupancy</label>
+                            <input type="number" id="aveOccup" step="0.1" required>
+                            <small>Average household members</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="latitude">Latitude</label>
+                            <input type="number" id="latitude" step="0.01" required>
+                            <small>Geographic latitude</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="longitude">Longitude</label>
+                            <input type="number" id="longitude" step="0.01" required>
+                            <small>Geographic longitude</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="predictBtn">
+                        Predict Price
+                    </button>
+
+                    <button type="button" class="btn btn-secondary" onclick="predictWithConfidence()">
+                        Predict with Confidence Interval
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Panel: Results -->
+            <div class="card">
+                <h2>Prediction Results</h2>
+
+                <div id="resultContainer">
+                    <div class="info-banner">
+                        <strong>👋 Welcome!</strong>
+                        Enter property details on the left and click "Predict Price" to get started.
+                        <br><br>
+                        <strong>💡 Tip:</strong> Try the quick examples above for pre-filled data!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📚 Feature Descriptions</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                <div>
+                    <strong>Median Income:</strong> Median household income in $10,000s
+                </div>
+                <div>
+                    <strong>House Age:</strong> Median age of houses in the block
+                </div>
+                <div>
+                    <strong>Avg Rooms:</strong> Average number of rooms per household
+                </div>
+                <div>
+                    <strong>Avg Bedrooms:</strong> Average number of bedrooms per household
+                </div>
+                <div>
+                    <strong>Population:</strong> Total block group population
+                </div>
+                <div>
+                    <strong>Avg Occupancy:</strong> Average number of household members
+                </div>
+                <div>
+                    <strong>Latitude:</strong> Block group latitude coordinate
+                </div>
+                <div>
+                    <strong>Longitude:</strong> Block group longitude coordinate
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Presets
+        const presets = {
+            luxury: {
+                medInc: 8.3252,
+                houseAge: 41,
+                aveRooms: 6.984,
+                aveBedrms: 1.024,
+                population: 322,
+                aveOccup: 2.556,
+                latitude: 37.88,
+                longitude: -122.23
+            },
+            average: {
+                medInc: 3.8,
+                houseAge: 25,
+                aveRooms: 5.5,
+                aveBedrms: 1.2,
+                population: 1200,
+                aveOccup: 3.0,
+                latitude: 34.05,
+                longitude: -118.24
+            },
+            budget: {
+                medInc: 2.5,
+                houseAge: 15,
+                aveRooms: 4.8,
+                aveBedrms: 1.0,
+                population: 800,
+                aveOccup: 2.5,
+                latitude: 36.74,
+                longitude: -119.78
+            }
+        };
+
+        // Load preset data
+        function loadPreset(type) {
+            const preset = presets[type];
+            document.getElementById('medInc').value = preset.medInc;
+            document.getElementById('houseAge').value = preset.houseAge;
+            document.getElementById('aveRooms').value = preset.aveRooms;
+            document.getElementById('aveBedrms').value = preset.aveBedrms;
+            document.getElementById('population').value = preset.population;
+            document.getElementById('aveOccup').value = preset.aveOccup;
+            document.getElementById('latitude').value = preset.latitude;
+            document.getElementById('longitude').value = preset.longitude;
+        }
+
+        // Get features from form
+        function getFeatures() {
+            return [
+                parseFloat(document.getElementById('medInc').value),
+                parseFloat(document.getElementById('houseAge').value),
+                parseFloat(document.getElementById('aveRooms').value),
+                parseFloat(document.getElementById('aveBedrms').value),
+                parseFloat(document.getElementById('population').value),
+                parseFloat(document.getElementById('aveOccup').value),
+                parseFloat(document.getElementById('latitude').value),
+                parseFloat(document.getElementById('longitude').value)
+            ];
+        }
+
+        // Get API URL
+        function getApiUrl() {
+            return document.getElementById('apiUrl').value.trim();
+        }
+
+        // Check API health
+        async function checkHealth() {
+            const apiUrl = getApiUrl();
+            if (!apiUrl) {
+                alert('Please enter API endpoint URL');
+                return;
+            }
+
+            const statusDiv = document.getElementById('healthStatus');
+            statusDiv.innerHTML = '<div style="margin-top: 10px; text-align: center;">Checking...</div>';
+
+            try {
+                const response = await fetch(`${apiUrl}/health`);
+                const data = await response.json();
+
+                if (response.ok && data.status === 'healthy') {
+                    statusDiv.innerHTML = `
+                        <div class="health-status" style="background: #d4edda; color: #155724; margin-top: 10px;">
+                            <span class="status-indicator status-online"></span>
+                            <strong>Connected!</strong> Model is loaded and ready.
+                        </div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = `
+                        <div class="health-status" style="background: #f8d7da; color: #721c24; margin-top: 10px;">
+                            <span class="status-indicator status-offline"></span>
+                            <strong>Unhealthy:</strong> ${data.error || 'Model not loaded'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="health-status" style="background: #f8d7da; color: #721c24; margin-top: 10px;">
+                        <span class="status-indicator status-offline"></span>
+                        <strong>Connection Failed:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Make prediction
+        async function makePrediction(endpoint = '/predict') {
+            const apiUrl = getApiUrl();
+            if (!apiUrl) {
+                showResult('error', 'Please enter API endpoint URL', null);
+                return;
+            }
+
+            const features = getFeatures();
+            const resultContainer = document.getElementById('resultContainer');
+            const predictBtn = document.getElementById('predictBtn');
+
+            // Show loading
+            predictBtn.disabled = true;
+            predictBtn.innerHTML = '<span class="loading"></span> Predicting...';
+
+            resultContainer.innerHTML = `
+                <div class="result-box result-info">
+                    <div style="text-align: center;">
+                        <div class="loading" style="border-color: #17a2b8; border-top-color: transparent;"></div>
+                        <p style="margin-top: 10px;">Making prediction...</p>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${apiUrl}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ features })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult('success', null, data);
+                } else {
+                    showResult('error', data.error || 'Prediction failed', null);
+                }
+            } catch (error) {
+                showResult('error', `Network error: ${error.message}`, null);
+            } finally {
+                predictBtn.disabled = false;
+                predictBtn.innerHTML = 'Predict Price';
+            }
+        }
+
+        // Show result
+        function showResult(type, errorMessage, data) {
+            const resultContainer = document.getElementById('resultContainer');
+
+            if (type === 'error') {
+                resultContainer.innerHTML = `
+                    <div class="result-box result-error">
+                        <h3 style="color: #721c24; margin-bottom: 10px;">❌ Error</h3>
+                        <p>${errorMessage}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const price = data.prediction * 100000;
+            let html = `
+                <div class="result-box result-success">
+                    <h3 style="color: #155724; margin-bottom: 10px;">✅ Prediction Complete</h3>
+                    <div class="prediction-value">
+                        $${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                    <p style="text-align: center; color: #666;">Predicted Median House Value</p>
+            `;
+
+            if (data.confidence_interval) {
+                const lower = data.confidence_interval.lower_bound * 100000;
+                const upper = data.confidence_interval.upper_bound * 100000;
+                html += `
+                    <div class="confidence-range">
+                        <strong>95% Confidence Interval:</strong><br>
+                        $${lower.toLocaleString('en-US', { maximumFractionDigits: 0 })} -
+                        $${upper.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                    </div>
+                    <div style="text-align: center; color: #999; margin-top: 10px; font-size: 0.9rem;">
+                        Standard Deviation: ${data.confidence_interval.std_dev.toFixed(4)}
+                    </div>
+                `;
+            }
+
+            html += `
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4 style="margin-bottom: 10px; color: #667eea;">Input Features:</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.9rem;">
+                        <div><strong>Median Income:</strong> ${data.features_received[0]}</div>
+                        <div><strong>House Age:</strong> ${data.features_received[1]}</div>
+                        <div><strong>Avg Rooms:</strong> ${data.features_received[2]}</div>
+                        <div><strong>Avg Bedrooms:</strong> ${data.features_received[3]}</div>
+                        <div><strong>Population:</strong> ${data.features_received[4]}</div>
+                        <div><strong>Avg Occupancy:</strong> ${data.features_received[5]}</div>
+                        <div><strong>Latitude:</strong> ${data.features_received[6]}</div>
+                        <div><strong>Longitude:</strong> ${data.features_received[7]}</div>
+                    </div>
+                </div>
+            `;
+
+            resultContainer.innerHTML = html;
+        }
+
+        // Predict with confidence
+        async function predictWithConfidence() {
+            await makePrediction('/predict/confidence');
+        }
+
+        // Form submit handler
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await makePrediction('/predict');
+        });
+
+        // Load default preset on page load
+        window.addEventListener('load', () => {
+            loadPreset('luxury');
+        });
+    </script>
+</body>
+</html>

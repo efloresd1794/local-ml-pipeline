@@ -1,0 +1,36 @@
+{
+  "name": "ml-pipeline-infrastructure",
+  "version": "1.0.0",
+  "description": "CDK infrastructure for ML pipeline on LocalStack",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy --require-approval never",
+    "deploy:local": "cdklocal deploy --require-approval never",
+    "synth": "cdk synth",
+    "synth:local": "cdklocal synth",
+    "bootstrap": "cdk bootstrap",
+    "bootstrap:local": "cdklocal bootstrap",
+    "destroy": "cdk destroy",
+    "destroy:local": "cdklocal destroy"
+  },
+  "keywords": [
+    "cdk",
+    "localstack",
+    "ml",
+    "lambda"
+  ],
+  "author": "Edson Flores",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "aws-cdk": "^2.1032.0",
+    "aws-cdk-lib": "^2.225.0",
+    "constructs": "^10.4.3",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
