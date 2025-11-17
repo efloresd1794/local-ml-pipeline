@@ -37,8 +37,25 @@ This will:
 
 ## Test API (1 minute)
 
+### Option 1: Web GUI (Recommended) 🌐
+
 ```bash
-# Run tests
+# Start the web interface
+make web
+```
+
+Then open http://localhost:8080 in your browser!
+
+Features:
+- 🎨 Beautiful, user-friendly interface
+- 📊 Real-time predictions
+- 📈 Confidence intervals
+- 🔄 Quick preset examples
+
+### Option 2: Command Line Testing
+
+```bash
+# Run automated tests
 make test
 ```
 
@@ -75,6 +92,7 @@ curl -X POST $API_URL/predict \
 
 ```bash
 make help              # Show all commands
+make web               # Start web GUI (http://localhost:8080)
 make status           # Check LocalStack status
 make logs             # View LocalStack logs
 make s3-models        # List models in S3

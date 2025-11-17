@@ -46,6 +46,7 @@ This repository contains a complete machine learning pipeline that trains a hous
 - **S3 Storage**: Stores trained models and scalers in S3 (LocalStack)
 - **Lambda Inference**: Python Lambda function for real-time predictions
 - **API Gateway**: REST API for accessing the ML service
+- **Web GUI**: Beautiful web interface for making predictions (NEW!)
 - **CDK Infrastructure**: Infrastructure as Code using TypeScript CDK
 - **LocalStack**: Complete local development environment (no AWS account needed!)
 - **Mac M4 Optimized**: Configured for Apple Silicon architecture
@@ -153,15 +154,33 @@ This will:
 
 ### 5. Test the API
 
-```bash
-# Return to project root
-cd ..
+#### Option A: Web GUI (Recommended) 🌐
 
-# Run test script
+```bash
+# Start the web interface
+make web
+```
+
+Then open http://localhost:8080 in your browser!
+
+The web GUI provides:
+- 🎨 Beautiful, intuitive interface
+- 📊 Real-time predictions
+- 📈 Confidence interval visualization
+- 🔄 Quick preset examples (Luxury SF, Average LA, Budget Valley)
+- ✅ Built-in API health check
+- 📱 Responsive design (works on mobile too!)
+
+See [web/README.md](web/README.md) for more details.
+
+#### Option B: Command Line Testing
+
+```bash
+# Run automated test script
 python scripts/test-api.py
 ```
 
-Or test manually:
+#### Option C: Manual cURL Testing
 
 ```bash
 # Get API Gateway ID
@@ -286,9 +305,15 @@ local-ml-pipeline/
 │   ├── setup-localstack.sh       # Initial setup
 │   ├── deploy-localstack.sh      # Full deployment
 │   └── test-api.py               # API testing
+├── web/
+│   ├── index.html                # Web GUI (HTML + CSS + JS)
+│   ├── serve.py                  # Python web server with CORS
+│   └── README.md                 # Web GUI documentation
 ├── docker-compose.localstack.yml  # LocalStack configuration
 ├── .env.localstack               # LocalStack environment variables
 ├── requirements.txt              # Python dependencies
+├── Makefile                      # Common commands (make web, make deploy, etc.)
+├── QUICKSTART.md                 # Quick start guide
 └── README.localstack.md          # This file
 ```
 

@@ -1,4 +1,4 @@
-.PHONY: help setup start-localstack stop-localstack status data train deploy test clean
+.PHONY: help setup start-localstack stop-localstack status data train deploy test clean web
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  make deploy          - Deploy infrastructure to LocalStack"
 	@echo "  make deploy-all      - Full deployment (data + train + deploy)"
 	@echo "  make test            - Test the API"
+	@echo "  make web             - Start web GUI (http://localhost:8080)"
 	@echo "  make clean           - Clean up containers and data"
 	@echo "  make logs            - View LocalStack logs"
 	@echo ""
@@ -119,3 +120,15 @@ health:
 	else \
 		echo "API Gateway not found. Please deploy first."; \
 	fi
+
+# Start web GUI
+web:
+	@echo "Starting web GUI..."
+	@echo "Open http://localhost:8080 in your browser"
+	@echo ""
+	@echo "Don't forget to:"
+	@echo "  1. Get your API URL with: make api-url"
+	@echo "  2. Enter it in the web interface"
+	@echo "  3. Click 'Test Connection'"
+	@echo ""
+	@python3 web/serve.py
