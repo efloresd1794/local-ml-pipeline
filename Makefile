@@ -1,8 +1,11 @@
-.PHONY: help setup start-localstack stop-localstack status data train deploy test clean web
+.PHONY: help setup start-localstack stop-localstack status data train deploy test clean web quick-start run-api
 
 # Default target
 help:
 	@echo "ML Pipeline with LocalStack - Available Commands:"
+	@echo ""
+	@echo "  make quick-start      - Quick start (recommended for development)"
+	@echo "  make run-api          - Run FastAPI server (after quick-start)"
 	@echo ""
 	@echo "  make setup            - Initial setup (install dependencies)"
 	@echo "  make start-localstack - Start LocalStack container"
@@ -10,8 +13,8 @@ help:
 	@echo "  make status          - Check LocalStack status"
 	@echo "  make data            - Process training data"
 	@echo "  make train           - Train model and upload to S3"
-	@echo "  make deploy          - Deploy infrastructure to LocalStack"
-	@echo "  make deploy-all      - Full deployment (data + train + deploy)"
+	@echo "  make deploy          - Deploy infrastructure to LocalStack (not working)"
+	@echo "  make deploy-all      - Full deployment (data + train + deploy - not working)"
 	@echo "  make test            - Test the API"
 	@echo "  make web             - Start web GUI (http://localhost:8080)"
 	@echo "  make clean           - Clean up containers and data"
@@ -58,7 +61,7 @@ train:
 # Deploy infrastructure
 deploy:
 	@echo "Deploying CDK stack to LocalStack..."
-	@cd infrastructure && npm run deploy:local
+	@export AWS_ENDPOINT_URL=http://localhost:4566 AWS_ENDPOINT_URL_S3=http://localhost:4566 && cd infrastructure && npm run deploy:local
 
 # Full deployment
 deploy-all:
@@ -126,9 +129,26 @@ web:
 	@echo "Starting web GUI..."
 	@echo "Open http://localhost:8080 in your browser"
 	@echo ""
-	@echo "Don't forget to:"
-	@echo "  1. Get your API URL with: make api-url"
-	@echo "  2. Enter it in the web interface"
-	@echo "  3. Click 'Test Connection'"
+	@echo "API should be running at http://localhost:8000"
 	@echo ""
 	@python3 web/serve.py
+
+# Quick Start - Recommended workflow for development
+quick-start:
+	@echo "Running quick start..."
+	@chmod +x scripts/quick-start.sh
+	@./scripts/quick-start.sh
+
+# Run FastAPI server
+run-api:
+	@echo "Starting FastAPI server..."
+	@echo "API will be available at http://localhost:8000"
+	@echo ""
+	@echo "Endpoints:"
+	@echo "  GET  http://localhost:8000/health"
+	@echo "  POST http://localhost:8000/predict"
+	@echo "  POST http://localhost:8000/predict/confidence"
+	@echo ""
+	@echo "Press Ctrl+C to stop"
+	@echo ""
+	@source venv/bin/activate && python src/api/main.py

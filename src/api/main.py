@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sys
 import os
@@ -12,6 +13,15 @@ app = FastAPI(
     title="House Price Prediction API",
     description="An API for predicting house prices using machine learning",
     version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (for development)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Initialize predictor
@@ -32,7 +42,7 @@ class HouseFeatures(BaseModel):
     AveOccup: float  # Average occupancy
     Latitude: float  # Latitude
     Longitude: float  # Longitude
-    
+
     model_config = {
         "protected_namespaces": (),
         "json_schema_extra": {
@@ -48,6 +58,25 @@ class HouseFeatures(BaseModel):
             }
         }
     }
+
+# Array format (for web interface compatibility)
+class HouseFeaturesArray(BaseModel):
+    features: list[float]  # [MedInc, HouseAge, AveRooms, AveBedrms, Population, AveOccup, Latitude, Longitude]
+
+    def to_dict(self):
+        """Convert array to named dict"""
+        if len(self.features) != 8:
+            raise ValueError("Features array must contain exactly 8 values")
+        return {
+            "MedInc": self.features[0],
+            "HouseAge": self.features[1],
+            "AveRooms": self.features[2],
+            "AveBedrms": self.features[3],
+            "Population": self.features[4],
+            "AveOccup": self.features[5],
+            "Latitude": self.features[6],
+            "Longitude": self.features[7]
+        }
 
 class PredictionResponse(BaseModel):
     prediction: float
@@ -75,40 +104,68 @@ async def health_check():
         "api_version": "1.0.0"
     }
 
-@app.post("/predict", response_model=PredictionResponse)
-async def predict_price(features: HouseFeatures):
-    """Predict house price"""
+@app.post("/predict")
+async def predict_price(request: HouseFeaturesArray | HouseFeatures):
+    """Predict house price (accepts both array and object format)"""
     if predictor is None:
         raise HTTPException(status_code=503, detail="Predictor not initialized")
-    
+
     try:
-        # Convert to dict
-        input_data = features.dict()
-        
+        # Convert to dict based on input type
+        if isinstance(request, HouseFeaturesArray):
+            input_data = request.to_dict()
+            features_array = request.features
+        else:
+            input_data = request.model_dump()
+            # Convert dict to array for features_received
+            features_array = [
+                input_data["MedInc"], input_data["HouseAge"], input_data["AveRooms"],
+                input_data["AveBedrms"], input_data["Population"], input_data["AveOccup"],
+                input_data["Latitude"], input_data["Longitude"]
+            ]
+
         # Make prediction
         prediction = predictor.predict(input_data)
-        
-        return PredictionResponse(prediction=prediction)
-        
+
+        return {
+            "prediction": prediction,
+            "status": "success",
+            "features_received": features_array
+        }
+
     except Exception as e:
         logger.error(f"Prediction failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
-@app.post("/predict/confidence", response_model=ConfidencePredictionResponse)
-async def predict_price_with_confidence(features: HouseFeatures):
-    """Predict house price with confidence interval"""
+@app.post("/predict/confidence")
+async def predict_price_with_confidence(request: HouseFeaturesArray | HouseFeatures):
+    """Predict house price with confidence interval (accepts both array and object format)"""
     if predictor is None:
         raise HTTPException(status_code=503, detail="Predictor not initialized")
-    
+
     try:
-        # Convert to dict
-        input_data = features.dict()
-        
+        # Convert to dict based on input type
+        if isinstance(request, HouseFeaturesArray):
+            input_data = request.to_dict()
+            features_array = request.features
+        else:
+            input_data = request.model_dump()
+            # Convert dict to array for features_received
+            features_array = [
+                input_data["MedInc"], input_data["HouseAge"], input_data["AveRooms"],
+                input_data["AveBedrms"], input_data["Population"], input_data["AveOccup"],
+                input_data["Latitude"], input_data["Longitude"]
+            ]
+
         # Make prediction with confidence
         result = predictor.predict_with_confidence(input_data)
-        
-        return ConfidencePredictionResponse(**result)
-        
+
+        # Add features_received and status
+        result["features_received"] = features_array
+        result["status"] = "success"
+
+        return result
+
     except Exception as e:
         logger.error(f"Prediction with confidence failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")

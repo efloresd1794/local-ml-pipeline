@@ -28,6 +28,12 @@ Wait for: `LocalStack started!`
 # Run full deployment
 make deploy-all
 ```
+or
+from root folder:
+cd infrastruture
+cdklocal bootstrap aws://000000000000/us-east-1
+cdklocal deploy --verbose   
+
 
 This will:
 1. ✅ Process California Housing data

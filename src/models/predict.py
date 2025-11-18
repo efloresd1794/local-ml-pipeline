@@ -10,7 +10,7 @@ class HousePricePredictor:
         Initialize predictor with either local model or MLflow model
         """
         self.scaler = joblib.load('data/processed/scaler.pkl')
-        
+
         if model_path:
             self.model = joblib.load(model_path)
             logger.info(f"Loaded local model from {model_path}")
@@ -20,9 +20,13 @@ class HousePricePredictor:
             self.model = mlflow.sklearn.load_model(model_uri)
             logger.info(f"Loaded MLflow model: {model_uri}")
         else:
-            # Default to latest random forest model
-            self.model = joblib.load('models/random_forest_model.pkl')
-            logger.info("Loaded default random forest model")
+            # Default to latest random forest model (try .joblib first, then .pkl)
+            try:
+                self.model = joblib.load('models/random_forest_model.joblib')
+                logger.info("Loaded default random forest model (.joblib)")
+            except FileNotFoundError:
+                self.model = joblib.load('models/random_forest_model.pkl')
+                logger.info("Loaded default random forest model (.pkl)")
     
     def preprocess_input(self, input_data):
         """Preprocess input data for prediction"""
@@ -74,8 +78,9 @@ class HousePricePredictor:
             return {
                 'prediction': float(mean_pred[0]) if len(mean_pred) == 1 else mean_pred.tolist(),
                 'confidence_interval': {
-                    'lower': float(mean_pred[0] - 1.96 * std_pred[0]) if len(mean_pred) == 1 else (mean_pred - 1.96 * std_pred).tolist(),
-                    'upper': float(mean_pred[0] + 1.96 * std_pred[0]) if len(mean_pred) == 1 else (mean_pred + 1.96 * std_pred).tolist()
+                    'lower_bound': float(mean_pred[0] - 1.96 * std_pred[0]) if len(mean_pred) == 1 else (mean_pred - 1.96 * std_pred).tolist(),
+                    'upper_bound': float(mean_pred[0] + 1.96 * std_pred[0]) if len(mean_pred) == 1 else (mean_pred + 1.96 * std_pred).tolist(),
+                    'std_dev': float(std_pred[0]) if len(std_pred) == 1 else std_pred.tolist()
                 }
             }
         else:

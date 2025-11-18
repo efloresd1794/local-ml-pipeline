@@ -19,25 +19,16 @@ export class MLPipelineStack extends cdk.Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
-    // Lambda Layer for ML dependencies (scikit-learn, pandas, numpy, joblib)
-    const mlLayer = new lambda.LayerVersion(this, 'MLDependenciesLayer', {
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-layers/ml-dependencies')),
-      compatibleRuntimes: [lambda.Runtime.PYTHON_3_9],
-      description: 'ML dependencies: scikit-learn, pandas, numpy, joblib',
-    });
-
-    // Lambda function for model inference
-    const inferenceLambda = new lambda.Function(this, 'InferenceFunction', {
+    // Lambda function for model inference using Docker image
+    // This approach packages all dependencies (Python 3.9 + ML libs) in the container
+    const inferenceLambda = new lambda.DockerImageFunction(this, 'InferenceFunction', {
       functionName: 'ml-inference',
-      runtime: lambda.Runtime.PYTHON_3_9,
-      handler: 'inference.handler',
-      code: lambda.Code.fromAsset(path.join(__dirname, '../../src/lambda')),
+      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../src/lambda')),
       timeout: cdk.Duration.seconds(30),
       memorySize: 512,
-      layers: [mlLayer],
       environment: {
         MODEL_BUCKET: modelBucket.bucketName,
-        MODEL_KEY: 'models/house_price_model.joblib',
+        MODEL_KEY: 'models/house_price_random_forest_model.joblib',
         SCALER_KEY: 'models/scaler.joblib',
       },
     });

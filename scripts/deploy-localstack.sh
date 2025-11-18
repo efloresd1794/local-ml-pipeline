@@ -75,18 +75,9 @@ fi
 
 # 5. Deploy CDK stack
 echo -e "\n${GREEN}[5/5] Deploying CDK stack to LocalStack...${NC}"
+
 cd infrastructure
-
-# Bootstrap CDK (only needed once)
-if ! aws --endpoint-url=http://localhost:4566 s3 ls | grep -q cdk; then
-    echo "Bootstrapping CDK..."
-    npm run bootstrap:local || echo "Bootstrap may have failed, continuing..."
-fi
-
-# Deploy the stack
-echo "Deploying stack..."
-npm run deploy:local
-
+cdklocal deploy --require-approval never
 cd ..
 
 # Get API endpoint
