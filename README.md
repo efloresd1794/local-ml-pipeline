@@ -4,138 +4,255 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104%2B-green)](https://fastapi.tiangolo.com/)
 [![MLflow](https://img.shields.io/badge/MLflow-2.8%2B-orange)](https://mlflow.org/)
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue)](https://www.docker.com/)
+[![LocalStack](https://img.shields.io/badge/LocalStack-AWS%20Local-purple)](https://localstack.cloud/)
+[![AWS CDK](https://img.shields.io/badge/AWS%20CDK-TypeScript-orange)](https://aws.amazon.com/cdk/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A production-ready end-to-end machine learning pipeline for house price prediction, featuring MLflow experiment tracking, Docker deployment, and FastAPI serving with comprehensive CI/CD automation.
+A production-ready end-to-end machine learning pipeline for house price prediction, featuring **LocalStack AWS simulation**, MLflow experiment tracking, Docker deployment, FastAPI serving, and a beautiful web interface—all running locally without AWS costs!
 
 ## 🎯 **Project Overview**
 
-This project demonstrates enterprise-level ML engineering practices by implementing a complete pipeline from data ingestion to model deployment. Built with California Housing dataset, it showcases modern MLOps workflows including experiment tracking, model versioning, containerized deployment, and automated testing.
+This project demonstrates enterprise-level ML engineering practices by implementing a complete pipeline from data ingestion to model deployment. Built with California Housing dataset, it showcases modern MLOps workflows including experiment tracking, model versioning, containerized deployment, and **local AWS simulation with LocalStack**—enabling full cloud development without AWS costs!
 
 ### **Key Features**
 
 - 🔄 **Automated Data Pipeline** - Preprocessing, feature engineering, and data validation
 - 🧪 **MLflow Integration** - Experiment tracking, model registry, and versioning
 - 🚀 **FastAPI Service** - High-performance REST API with automatic documentation
+- ☁️ **LocalStack AWS Simulation** - Lambda, S3, API Gateway running locally via AWS CDK
+- 🎨 **Beautiful Web Interface** - Modern GUI for testing predictions with confidence intervals
 - 🐳 **Docker Deployment** - Containerized application with multi-service orchestration
 - 🧪 **Comprehensive Testing** - Unit tests, integration tests, and API validation
 - ⚙️ **CI/CD Pipeline** - Automated testing and deployment with GitHub Actions
 - 📊 **Model Monitoring** - Prediction confidence intervals and model performance tracking
+- 🛠️ **Make Commands** - Simple commands for common tasks (make web, make deploy, etc.)
 
 ## 🏗️ **Architecture**
 
+This project supports **three deployment modes** that share the same ML models:
+
+### **🔷 Mode 1: LocalStack AWS Simulation (Recommended)**
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Data Source   │───▶│  Data Pipeline   │───▶│  Feature Store  │
-│ (California     │    │  (Preprocessing) │    │   (Processed)   │
-│  Housing Data)  │    │                  │    │                 │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                                         │
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Prediction    │◀───│   FastAPI App    │◀───│  Model Training │
-│    Service      │    │   (REST API)     │    │  (MLflow Track) │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+Data Pipeline → S3-Aware Training → S3 (LocalStack)
+                                    ↓
+                           Lambda Function + ML Layer
+                                    ↓
+                              API Gateway (REST)
+                                    ↓
+                          Web GUI (localhost:8080)
+```
+
+### **🔷 Mode 2: Local FastAPI Development**
+```
+Data Pipeline → MLflow Training → Local Models (.pkl)
+                                    ↓
+                              FastAPI Server
+                                    ↓
+                          Web GUI (localhost:8080)
+```
+
+### **🔷 Mode 3: Docker Compose Orchestration**
+```
+Data Pipeline → MLflow Training → Models in Container
+                                    ↓
+                        FastAPI + MLflow + PostgreSQL
+                                    ↓
+                         Docker Network (localhost:8000)
 ```
 
 ## 📁 **Project Structure**
 
 ```
-house-price-ml-pipeline/
+local-ml-pipeline/
 ├── 📂 src/
 │   ├── 📂 data/
-│   │   └── 📄 data_pipeline.py      # Data processing and feature engineering
+│   │   └── 📄 data_pipeline.py        # Data processing and feature engineering
 │   ├── 📂 models/
-│   │   ├── 📄 train.py              # Model training with MLflow tracking
-│   │   └── 📄 predict.py            # Prediction service and model loading
+│   │   ├── 📄 train.py                # Model training with MLflow tracking (local)
+│   │   ├── 📄 train_s3.py             # Model training with S3 upload (LocalStack)
+│   │   └── 📄 predict.py              # Prediction service for FastAPI
+│   ├── 📂 lambda/
+│   │   └── 📄 inference.py            # Lambda handler for serverless inference
 │   └── 📂 api/
-│       └── 📄 main.py               # FastAPI application and endpoints
+│       └── 📄 main.py                 # FastAPI application and endpoints
+├── 📂 infrastructure/
+│   ├── 📂 bin/
+│   │   └── 📄 app.ts                  # CDK app entry point
+│   ├── 📂 lib/
+│   │   └── 📄 ml-pipeline-stack.ts    # CDK stack definition (Lambda, S3, API Gateway)
+│   ├── 📄 package.json                # Node.js dependencies
+│   └── 📄 cdk.json                    # CDK configuration
+├── 📂 lambda-layers/
+│   ├── 📂 ml-dependencies/            # Lambda layer with scikit-learn, pandas, etc.
+│   └── 📄 build-layer.sh              # Script to build Lambda layer
+├── 📂 web/
+│   ├── 📄 index.html                  # Beautiful web GUI for predictions
+│   ├── 📄 serve.py                    # Python web server with CORS
+│   └── 📄 README.md                   # Web GUI documentation
+├── 📂 scripts/
+│   ├── 📄 setup-localstack.sh         # Initial setup script
+│   ├── 📄 deploy-localstack.sh        # Full deployment script
+│   ├── 📄 test-api.py                 # API testing script
+│   └── 📄 quick-start.sh              # Quick start workflow
 ├── 📂 tests/
-│   └── 📄 test_api.py               # API integration tests
+│   └── 📄 test_api.py                 # API integration tests
 ├── 📂 docker/
-│   ├── 📄 Dockerfile                # Container configuration
-│   └── 📄 docker-compose.yml        # Multi-service orchestration
-├── 📂 .github/workflows/
-│   └── 📄 ci-cd.yml                 # CI/CD pipeline automation
+│   ├── 📄 Dockerfile                  # Container configuration
+│   └── 📄 docker-compose.yml          # Multi-service orchestration
 ├── 📂 data/
-│   ├── 📂 raw/                      # Raw dataset storage
-│   └── 📂 processed/                # Processed features and scalers
-├── 📂 models/                       # Trained model artifacts
-├── 📂 mlruns/                       # MLflow experiment tracking
-├── 📄 requirements.txt              # Python dependencies
-├── 📄 setup.py                      # Package configuration
-└── 📄 README.md                     # Project documentation
+│   ├── 📂 raw/                        # Raw dataset storage
+│   └── 📂 processed/                  # Processed features and scalers
+├── 📂 models/                         # Trained model artifacts (local)
+├── 📂 mlruns/                         # MLflow experiment tracking
+├── 📄 docker-compose.localstack.yml   # LocalStack configuration
+├── 📄 Makefile                        # Common commands (make web, make deploy, etc.)
+├── 📄 requirements.txt                # Python dependencies
+├── 📄 setup.py                        # Package configuration
+├── 📄 CLAUDE.md                       # Development guide for Claude Code
+├── 📄 README.md                       # This file
+└── 📄 README.localstack.md            # Detailed LocalStack documentation
 ```
 
 ## 🚀 **Quick Start**
 
-### **Prerequisites**
-- Python 3.8+
-- Docker (optional, for containerized deployment)
+Choose your preferred deployment mode:
+
+### **⚡ Option 1: Quick Start (Recommended)**
+
+The fastest way to get up and running with LocalStack:
+
+```bash
+# One-command setup
+make quick-start
+
+# In a new terminal, start the web interface
+make web
+```
+
+Then open http://localhost:8080 in your browser to interact with the API! 🎉
+
+---
+
+### **☁️ Option 2: LocalStack AWS Simulation**
+
+Full AWS infrastructure running locally:
+
+#### **Prerequisites**
+- Python 3.9+
+- Docker Desktop (running)
+- Node.js 18+
 - Git
 
-### **1. Installation**
+#### **Setup & Deploy**
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/house-price-ml-pipeline.git
-cd house-price-ml-pipeline
+# Step 1: Setup (first time only)
+make setup
 
-# Create virtual environment
+# Step 2: Start LocalStack
+make start-localstack
+
+# Step 3: Process data and train model
+make data
+make train
+
+# Step 4: Deploy infrastructure (Lambda, API Gateway, S3)
+make deploy
+
+# Step 5: Test the API
+make test
+
+# Step 6: Start web interface
+make web
+```
+
+**Available Make Commands:**
+```bash
+make help              # Show all available commands
+make status            # Check LocalStack health
+make api-url           # Get API Gateway URL
+make health            # Quick API health check
+make s3-models         # List models in S3
+make logs              # View LocalStack logs
+make clean             # Clean up everything
+```
+
+---
+
+### **🚀 Option 3: Local FastAPI Development**
+
+Traditional FastAPI server with MLflow tracking:
+
+```bash
+# Setup
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
 pip install -r requirements.txt
 pip install -e .
-```
 
-### **2. Run the Pipeline**
-
-```bash
-# Step 1: Process data
+# Run pipeline
 python src/data/data_pipeline.py
-
-# Step 2: Train models
 python src/models/train.py
-
-# Step 3: Start API server
 python src/api/main.py
+
+# In another terminal, start web interface
+make web
 ```
 
-### **3. Test the API**
+**Services:**
+- **API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
+- **MLflow UI**: `mlflow ui --port 5000` → http://localhost:5000
+- **Web GUI**: http://localhost:8080
+
+---
+
+## 🎨 **Web Interface**
+
+A beautiful, modern web GUI for interacting with the ML API!
+
+### **Features**
+
+- 🎯 **User-Friendly Interface** - Clean, intuitive design with gradient backgrounds
+- 📊 **Real-time Predictions** - Instant predictions with visual feedback
+- 📈 **Confidence Intervals** - 95% confidence interval display for RandomForest models
+- 🔄 **Quick Presets** - Pre-filled examples (Luxury SF, Average LA, Budget Valley)
+- ✅ **Health Check** - Test API connectivity before making predictions
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+
+### **Usage**
 
 ```bash
-# Health check
-curl -X GET "http://localhost:8000/health"
+# Start the web server
+make web
 
-# Make prediction
-curl -X POST "http://localhost:8000/predict" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "MedInc": 8.3252,
-       "HouseAge": 41.0,
-       "AveRooms": 6.984,
-       "AveBedrms": 1.024,
-       "Population": 322.0,
-       "AveOccup": 2.555,
-       "Latitude": 37.88,
-       "Longitude": -122.23
-     }'
+# Or manually
+python web/serve.py
 ```
 
-**Expected Response:**
-```json
-{
-  "prediction": 4.526,
-  "status": "success"
-}
-```
+Then open **http://localhost:8080** in your browser!
 
-### **4. Run Tests**
+### **How It Works**
 
-```bash
-pytest tests/ -v
-```
+1. **Configure API**: Enter your API Gateway URL (from `make api-url`) or use `http://localhost:8000` for local FastAPI
+2. **Test Connection**: Click "Test Connection" to verify API is responding
+3. **Make Predictions**:
+   - Use quick presets or enter custom values
+   - Click "Predict Price" for simple prediction
+   - Click "Predict with Confidence Interval" for detailed results with uncertainty bounds
+
+### **Screenshots**
+
+The interface includes:
+- Input fields for all 8 California Housing features with tooltips
+- Quick preset buttons for common scenarios
+- Real-time prediction results with formatted currency
+- Confidence interval visualization (when applicable)
+- Error handling and loading states
+
+See [web/README.md](web/README.md) for detailed documentation.
+
+---
 
 ## 🐳 **Docker Deployment**
 
@@ -222,28 +339,64 @@ Visit: http://localhost:5000
 - Model versioning and registry
 - Artifact storage (models, plots, data)
 
-## ☁️ **AWS Cloud Enhancement**
+## ☁️ **LocalStack to AWS Migration**
 
-This pipeline is designed for seamless migration to **AWS SageMaker** for enterprise-scale ML operations. The current local implementation serves as a foundation that can be enhanced with AWS services:
+This project **already implements AWS infrastructure locally** using LocalStack! The same CDK code can deploy to real AWS with minimal changes.
 
-**🔄 SageMaker Integration Path:**
-- **SageMaker Processing Jobs**: Replace local data pipeline with scalable preprocessing using SageMaker Processing, enabling parallel feature engineering across multiple instances
-- **SageMaker Training Jobs**: Migrate MLflow experiments to SageMaker Experiments with automatic hyperparameter tuning using SageMaker Automatic Model Tuning
-- **SageMaker Model Registry**: Replace local MLflow registry with SageMaker Model Registry for enterprise model governance and automated A/B testing
-- **SageMaker Endpoints**: Deploy FastAPI as SageMaker real-time endpoints with auto-scaling and multi-model hosting capabilities
-- **SageMaker Pipelines**: Convert the entire workflow into a SageMaker Pipeline with automated retraining triggers based on data drift detection
-- **Additional AWS Services**: Integrate S3 for data lake storage, CloudWatch for monitoring, Lambda for serverless processing, and EventBridge for workflow orchestration
+### **✅ Currently Implemented (LocalStack)**
 
-This architecture enables **production-scale ML operations** with enterprise features like automated model deployment, A/B testing, data drift detection, and cost optimization through managed infrastructure.
+- ✅ **Lambda Functions** - Serverless inference with ML dependencies
+- ✅ **S3 Storage** - Model artifacts and scalers stored in S3
+- ✅ **API Gateway** - REST API with CORS support
+- ✅ **AWS CDK** - Infrastructure as Code in TypeScript
+- ✅ **Lambda Layers** - Pre-built ML dependencies (scikit-learn, pandas, numpy)
+
+### **🚀 Deploy to Real AWS**
+
+To deploy to production AWS (when ready):
+
+```bash
+# Configure AWS credentials
+aws configure
+
+# Set environment variable
+export USE_LOCALSTACK=false
+
+# Deploy to AWS
+cd infrastructure
+npm run bootstrap  # First time only
+npm run deploy     # Deploy stack
+```
+
+### **📈 Future AWS Enhancements**
+
+**SageMaker Integration Path:**
+- **SageMaker Processing Jobs**: Scale data preprocessing with parallel instances
+- **SageMaker Training Jobs**: Automated hyperparameter tuning
+- **SageMaker Model Registry**: Enterprise model governance and A/B testing
+- **SageMaker Endpoints**: Auto-scaling real-time inference
+- **SageMaker Pipelines**: End-to-end workflow automation with retraining triggers
+- **Additional Services**: CloudWatch monitoring, EventBridge orchestration, Step Functions for complex workflows
 
 ## 🎯 **Next Steps & Enhancements**
 
-- [ ] **SageMaker Migration**: Convert pipeline to SageMaker Processing, Training, and Endpoints
-- [ ] **Model Monitoring**: Add SageMaker Model Monitor for prediction drift detection
-- [ ] **A/B Testing**: Implement SageMaker multi-variant endpoints for model comparison
-- [ ] **Batch Predictions**: Add SageMaker Batch Transform for bulk predictions
-- [ ] **Model Explainability**: Integrate SageMaker Clarify for feature importance and bias detection
-- [ ] **Real-time Streaming**: Add Kinesis Data Streams for live predictions with SageMaker
+**Deployment:**
+- [ ] Deploy to real AWS account (currently local-only with LocalStack)
+- [ ] Add CloudWatch alarms and dashboards
+- [ ] Implement API authentication (API Keys, Cognito, or IAM)
+- [ ] Set up CI/CD pipeline for automated deployments
+
+**ML Enhancements:**
+- [ ] Add more model types (XGBoost, LightGBM, Neural Networks)
+- [ ] Implement hyperparameter tuning with Optuna or SageMaker HPO
+- [ ] Add model explainability (SHAP values, feature importance)
+- [ ] Data drift detection and monitoring
+
+**Infrastructure:**
+- [ ] Migrate to SageMaker for enterprise-scale operations
+- [ ] Add batch prediction endpoints
+- [ ] Implement model versioning and A/B testing
+- [ ] Set up data lake with S3 + Athena for analytics
 
 ---
 
