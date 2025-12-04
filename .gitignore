@@ -2,9 +2,11 @@
 __pycache__/
 *.py[cod]
 *$py.class
-CLAUDE.md
 # C extensions
 *.so
+
+CLAUDE.md
+README.localstack.md
 
 # Distribution / packaging
 .Python

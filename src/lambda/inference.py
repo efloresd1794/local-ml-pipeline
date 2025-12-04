@@ -89,7 +89,7 @@ def load_model_from_s3():
 
 def preprocess_features(features: List[float], scaler) -> np.ndarray:
     """
-    Preprocess input features
+    Preprocess input features with feature engineering
 
     Expected features (8):
     - MedInc: Median income in block group
@@ -100,9 +100,30 @@ def preprocess_features(features: List[float], scaler) -> np.ndarray:
     - AveOccup: Average number of household members
     - Latitude: Block group latitude
     - Longitude: Block group longitude
+
+    Returns 11 features after engineering:
+    - 8 original features
+    - rooms_per_household (AveRooms / AveOccup)
+    - bedrooms_per_room (AveBedrms / AveRooms)
+    - population_per_household (Population / AveOccup)
     """
+    # Extract individual features
+    MedInc, HouseAge, AveRooms, AveBedrms, Population, AveOccup, Latitude, Longitude = features
+
+    # Feature engineering (same as in data_pipeline.py)
+    rooms_per_household = AveRooms / AveOccup if AveOccup != 0 else 0
+    bedrooms_per_room = AveBedrms / AveRooms if AveRooms != 0 else 0
+    population_per_household = Population / AveOccup if AveOccup != 0 else 0
+
+    # Combine original and engineered features
+    engineered_features = [
+        MedInc, HouseAge, AveRooms, AveBedrms, Population, AveOccup,
+        Latitude, Longitude,
+        rooms_per_household, bedrooms_per_room, population_per_household
+    ]
+
     # Convert to numpy array
-    features_array = np.array(features).reshape(1, -1)
+    features_array = np.array(engineered_features).reshape(1, -1)
 
     # Scale features
     features_scaled = scaler.transform(features_array)

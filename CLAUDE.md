@@ -26,7 +26,10 @@ make train                   # Train models and upload to S3
 
 # Infrastructure deployment
 cd infrastructure && npm install  # First time only
+make bootstrap               # Bootstrap CDK for LocalStack (one-time setup)
+make build-layer             # Build Lambda layer with ML dependencies
 make deploy                  # Deploy CDK stack (Lambda, API Gateway, S3)
+                             # Note: build-layer runs automatically before deploy
 
 # Full deployment workflow
 make deploy-all              # Runs data + train + deploy in sequence
@@ -168,8 +171,15 @@ These features are computed in:
 
 Components:
 - **S3 Bucket** (`ml-model-artifacts`): Versioned bucket for model artifacts
-- **Lambda Layer**: ML dependencies (scikit-learn, pandas, numpy, joblib) built from `lambda-layers/ml-dependencies/`
-- **Lambda Function** (`ml-inference`): Python 3.9, 512MB memory, 30s timeout, handler: `inference.handler`
+- **Lambda Layer** (`MLDependenciesLayer`): ML dependencies (scikit-learn, pandas, numpy, joblib, boto3) built from `lambda-layers/ml-dependencies/`
+  - Compatible with Python 3.9, 3.10, 3.11
+  - Built using `make build-layer` or `./lambda-layers/build-layer.sh`
+- **Lambda Function** (`ml-inference`):
+  - Runtime: Python 3.9
+  - Handler: `inference.handler`
+  - Memory: 512MB
+  - Timeout: 30s
+  - Uses Lambda Layer for dependencies (no Docker required)
 - **API Gateway**: REST API with CORS enabled, routes: `/health`, `/predict`, `/predict/confidence`
 
 **Environment Variables** (Lambda):
@@ -177,7 +187,7 @@ Components:
 - `MODEL_KEY`: models/house_price_random_forest_model.joblib
 - `SCALER_KEY`: models/scaler.joblib
 - `AWS_ENDPOINT_URL`: http://localhost:4566 (for LocalStack)
-- `AWS_ENDPOINT_URL_S3`: http://localhost:4566 (required by newer cdklocal versions)
+- `AWS_ENDPOINT_URL_S3`: http://localhost:4566 (for LocalStack S3 compatibility)
 
 ## API Endpoints
 
@@ -235,14 +245,27 @@ aws --endpoint-url=http://localhost:4566 s3 ls
 ```
 
 **Lambda Layer Building**:
-Lambda layers must be built before deployment:
+Lambda layers must be built before deployment (automatically handled by `make deploy`):
 ```bash
+make build-layer
+# OR manually:
 cd lambda-layers
-./build-layer.sh  # Creates python package with ML dependencies
+./build-layer.sh  # Creates python/ package with ML dependencies
+```
+
+The layer structure:
+```
+lambda-layers/ml-dependencies/
+├── requirements.txt          # Dependencies: boto3, joblib, numpy, scikit-learn, scipy
+└── python/                   # Built packages (created by build-layer.sh)
+    ├── sklearn/
+    ├── numpy/
+    ├── joblib/
+    └── ... (other dependencies)
 ```
 
 **CDK with LocalStack**:
-Uses `cdklocal` wrapper (installed via aws-cdk-local npm package) which automatically sets endpoint URLs for LocalStack.
+Uses `cdklocal` wrapper (installed via aws-cdk-local npm package) which automatically sets endpoint URLs for LocalStack. The simplified Lambda function (non-Docker) is more compatible with LocalStack than the previous Docker-based approach.
 
 ## Important Notes
 
@@ -252,9 +275,11 @@ Uses `cdklocal` wrapper (installed via aws-cdk-local npm package) which automati
 
 3. **LocalStack Deployment Order**:
    - Start LocalStack (`make start-localstack`)
+   - Bootstrap CDK (`make bootstrap`) - **one-time setup, creates CDK toolkit stack**
    - Process data (`make data`)
    - Train models (`make train`) - uploads to S3
-   - Deploy infrastructure (`make deploy`) - creates Lambda + API Gateway
+   - Build Lambda Layer (`make build-layer`) - automatically runs with deploy
+   - Deploy infrastructure (`make deploy`) - creates Lambda + Layer + API Gateway
    - Test API (`make test` or `make health`)
 
 4. **Model Path Differences**:
@@ -270,14 +295,14 @@ Uses `cdklocal` wrapper (installed via aws-cdk-local npm package) which automati
 
 8. **CDK Environment Variables**: Newer versions of `cdklocal` require both `AWS_ENDPOINT_URL` and `AWS_ENDPOINT_URL_S3` to be set. These are automatically configured in `.env.localstack`, the deployment script, and Makefile.
 
-9. **LocalStack CDK Lambda Deployment Limitation**: LocalStack has a known compatibility issue with CDK's Lambda asset publishing mechanism (IAM/STS role assumption + S3 upload). While the bootstrap bucket and IAM roles are created correctly, CDK fails to publish Lambda code and layers with error "The specified bucket does not exist" or "Region is missing". This is a LocalStack bug, not a configuration issue. **Working Solution**: Use the hybrid approach - upload models to LocalStack S3 but run the API locally with FastAPI:
+9. **Lambda Architecture**: The project uses a **simple Lambda function with Lambda Layer** approach instead of Docker-based Lambda. This is more compatible with LocalStack and easier to debug. The Lambda Layer contains all ML dependencies (scikit-learn, pandas, numpy, joblib), and the Lambda function code (`src/lambda/inference.py`) is deployed separately. If you encounter deployment issues with LocalStack, use the hybrid approach:
    ```bash
    make start-localstack
    make data && make train    # Uploads models to LocalStack S3
    python src/api/main.py     # Run FastAPI locally (port 8000)
    make web                   # Web GUI (port 8080)
    ```
-   This provides the same functionality without requiring Lambda deployment. For production AWS deployment, the full CDK stack works perfectly.
+   For production AWS deployment, the full CDK stack (with Lambda) works perfectly.
 
 ## Development Workflow
 

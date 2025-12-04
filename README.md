@@ -140,8 +140,9 @@ Full AWS infrastructure running locally:
 #### **Prerequisites**
 - Python 3.9+
 - Docker Desktop (running)
-- Node.js 18+
+- Node.js 18+ (optional, for CDK deployment)
 - Git
+- AWS CLI installed
 
 #### **Setup & Deploy**
 
@@ -157,7 +158,9 @@ make data
 make train
 
 # Step 4: Deploy infrastructure (Lambda, API Gateway, S3)
-make deploy
+make deploy-direct     # ⭐ Recommended: Direct deployment (bypasses CDK issues)
+# OR
+make deploy            # Alternative: CDK deployment (requires Node.js and CDK setup)
 
 # Step 5: Test the API
 make test
@@ -174,8 +177,14 @@ make api-url           # Get API Gateway URL
 make health            # Quick API health check
 make s3-models         # List models in S3
 make logs              # View LocalStack logs
+make deploy-direct     # Direct Lambda deployment (recommended)
 make clean             # Clean up everything
 ```
+
+**Notes:**
+- `make deploy-direct` is recommended as it bypasses known CDK/LocalStack compatibility issues with Lambda asset publishing
+- The direct deployment uses Docker to build Lambda packages with correct architecture (x86_64) even on Apple Silicon
+- API Gateway URL format: `http://localhost:4566/restapis/{api-id}/prod/_user_request_`
 
 ---
 
@@ -285,19 +294,20 @@ docker-compose restart house-price-api
 
 ## 📊 **API Documentation**
 
-Once the API is running, visit http://localhost:8000/docs for interactive API documentation.
+Once the API is running, visit http://localhost:8000/docs for interactive API documentation (FastAPI only).
 
 ### **Endpoints**
 
-| Method | Endpoint | Description | 
-|--------|----------|-------------|
-| `GET` | `/` | API status and welcome message |
-| `GET` | `/health` | Detailed health check |
-| `POST` | `/predict` | Single house price prediction |
-| `POST` | `/predict/confidence` | Prediction with confidence interval |
+| Method | Endpoint | Description | LocalStack | FastAPI |
+|--------|----------|-------------|------------|---------|
+| `GET` | `/` | API status and welcome message | ❌ | ✅ |
+| `GET` | `/health` | Detailed health check | ✅ | ✅ |
+| `POST` | `/predict` | Single house price prediction | ✅ | ✅ |
+| `POST` | `/predict/confidence` | Prediction with confidence interval | ❌ | ✅ |
 
 ### **Request Format**
 
+**FastAPI (Local Development):**
 ```json
 {
   "MedInc": 8.3252,       // Median income in block group
@@ -309,6 +319,43 @@ Once the API is running, visit http://localhost:8000/docs for interactive API do
   "Latitude": 37.88,      // Block group latitude
   "Longitude": -122.23    // Block group longitude
 }
+```
+
+**Lambda (LocalStack):**
+```json
+{
+  "features": [8.3252, 41.0, 6.984, 1.024, 322.0, 2.555, 37.88, -122.23]
+}
+```
+
+### **Example curl Commands**
+
+**LocalStack Health Check:**
+```bash
+curl http://localhost:4566/restapis/{api-id}/prod/_user_request_/health
+```
+
+**LocalStack Prediction:**
+```bash
+curl -X POST http://localhost:4566/restapis/{api-id}/prod/_user_request_/predict \
+  -H 'Content-Type: application/json' \
+  -d '{"features": [8.3252, 41.0, 6.984, 1.024, 322.0, 2.555, 37.88, -122.23]}'
+```
+
+**FastAPI Prediction:**
+```bash
+curl -X POST http://localhost:8000/predict \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "MedInc": 8.3252,
+    "HouseAge": 41.0,
+    "AveRooms": 6.984,
+    "AveBedrms": 1.024,
+    "Population": 322.0,
+    "AveOccup": 2.555,
+    "Latitude": 37.88,
+    "Longitude": -122.23
+  }'
 ```
 
 ## 🧪 **Testing**
@@ -377,6 +424,123 @@ npm run deploy     # Deploy stack
 - **SageMaker Endpoints**: Auto-scaling real-time inference
 - **SageMaker Pipelines**: End-to-end workflow automation with retraining triggers
 - **Additional Services**: CloudWatch monitoring, EventBridge orchestration, Step Functions for complex workflows
+
+## 🔧 **Troubleshooting**
+
+### **Common Issues & Solutions**
+
+#### **1. "API Gateway not found" when running `make test` or `make api-url`**
+
+**Issue**: AWS CLI commands fail with "You must specify a region" error.
+
+**Solution**: This is fixed in the latest version. Ensure you have the updated `Makefile` and `scripts/test-api.py` that include `AWS_DEFAULT_REGION=us-east-1`.
+
+**Manual Test**:
+```bash
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 \
+  aws --endpoint-url=http://localhost:4566 apigateway get-rest-apis
+```
+
+---
+
+#### **2. Lambda import error: "Unable to import module 'inference'"**
+
+**Issue**: Numpy/scikit-learn architecture mismatch (ARM64 vs x86_64).
+
+**Solution**: The deployment script now uses Docker with `--platform linux/amd64` to build packages in the correct architecture:
+```bash
+make deploy-direct  # This handles architecture automatically
+```
+
+If you're manually building, ensure Docker is running and the script uses the AWS Lambda Python base image.
+
+---
+
+#### **3. Lambda can't connect to LocalStack S3**
+
+**Issue**: Lambda returns "Could not connect to endpoint URL: http://localhost:4566".
+
+**Solution**: Lambda runs inside Docker, so use `host.docker.internal` instead of `localhost`. The deployment script sets this automatically:
+```bash
+AWS_ENDPOINT_URL=http://host.docker.internal:4566
+```
+
+---
+
+#### **4. Feature count mismatch: "X has 8 features but StandardScaler expects 11"**
+
+**Issue**: Lambda receives 8 features but scaler was trained with 11 (8 original + 3 engineered).
+
+**Solution**: The Lambda function now automatically performs feature engineering (rooms_per_household, bedrooms_per_room, population_per_household) before scaling. This is fixed in `src/lambda/inference.py`.
+
+---
+
+#### **5. CORS errors in web interface**
+
+**Issue**: Browser blocks preflight requests with CORS policy error.
+
+**Solution**: The deployment script now adds OPTIONS method support for CORS preflight requests. Redeploy with:
+```bash
+make deploy-direct
+```
+
+---
+
+#### **6. CDK deployment fails with "The specified bucket does not exist"**
+
+**Issue**: Known LocalStack compatibility issue with CDK Lambda asset publishing (versions >= 2.177.0).
+
+**Solution**: Use the direct deployment method instead:
+```bash
+make deploy-direct  # Bypasses CDK entirely
+```
+
+This is the recommended approach and works reliably with LocalStack.
+
+---
+
+#### **7. Docker entrypoint error during layer build**
+
+**Issue**: "entrypoint requires the handler name to be the first argument"
+
+**Solution**: Fixed in deployment script by adding `--entrypoint ""` to Docker run command. Update to latest version:
+```bash
+git pull origin main
+make deploy-direct
+```
+
+---
+
+#### **8. Models not found in S3**
+
+**Issue**: Deployment script can't detect models despite successful upload.
+
+**Solution**: Ensure AWS credentials are set before checking S3:
+```bash
+export AWS_ACCESS_KEY_ID=test
+export AWS_SECRET_ACCESS_KEY=test
+export AWS_DEFAULT_REGION=us-east-1
+
+# Then check
+aws --endpoint-url=http://localhost:4566 s3 ls s3://ml-model-artifacts/models/
+```
+
+Or use the make command:
+```bash
+make s3-models
+```
+
+---
+
+### **Getting Help**
+
+If you encounter issues not listed here:
+1. Check LocalStack logs: `make logs`
+2. Verify LocalStack is healthy: `make status`
+3. Check the [CLAUDE.md](CLAUDE.md) file for detailed development notes
+4. Review [README.localstack.md](README.localstack.md) for LocalStack-specific documentation
+
+---
 
 ## 🎯 **Next Steps & Enhancements**
 

@@ -16,6 +16,8 @@ services:
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - LAMBDA_RUNTIME_ENVIRONMENT_TIMEOUT=300
+      - LAMBDA_MOUNT_CODE=1
+      - LAMBDA_REMOVE_CONTAINERS=0
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./localstack-data}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"

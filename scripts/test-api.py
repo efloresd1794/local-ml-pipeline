@@ -19,11 +19,19 @@ def get_api_url():
         # Try to get from LocalStack
         import subprocess
         try:
+            # Set AWS credentials for LocalStack
+            env = os.environ.copy()
+            env['AWS_ACCESS_KEY_ID'] = 'test'
+            env['AWS_SECRET_ACCESS_KEY'] = 'test'
+            env['AWS_DEFAULT_REGION'] = 'us-east-1'
+
             result = subprocess.run(
                 ['aws', '--endpoint-url=http://localhost:4566', 'apigateway',
-                 'get-rest-apis', '--query', 'items[0].id', '--output', 'text'],
+                 'get-rest-apis', '--query', "items[?name=='ML-Inference-API'].id",
+                 '--output', 'text'],
                 capture_output=True,
-                text=True
+                text=True,
+                env=env
             )
             api_id = result.stdout.strip()
 

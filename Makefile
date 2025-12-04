@@ -13,8 +13,11 @@ help:
 	@echo "  make status          - Check LocalStack status"
 	@echo "  make data            - Process training data"
 	@echo "  make train           - Train model and upload to S3"
-	@echo "  make deploy          - Deploy infrastructure to LocalStack (not working)"
-	@echo "  make deploy-all      - Full deployment (data + train + deploy - not working)"
+	@echo "  make build-layer     - Build Lambda layer with ML dependencies"
+	@echo "  make bootstrap       - Bootstrap CDK for LocalStack (one-time setup)"
+	@echo "  make deploy          - Deploy infrastructure to LocalStack (CDK)"
+	@echo "  make deploy-direct   - Deploy Lambda directly (bypasses CDK issues) ⭐"
+	@echo "  make deploy-all      - Full deployment (data + train + deploy)"
 	@echo "  make test            - Test the API"
 	@echo "  make web             - Start web GUI (http://localhost:8080)"
 	@echo "  make clean           - Clean up containers and data"
@@ -59,7 +62,7 @@ train:
 	@. venv/bin/activate && python -m src.models.train_s3
 
 # Deploy infrastructure
-deploy:
+deploy: build-layer
 	@echo "Deploying CDK stack to LocalStack..."
 	@export AWS_ENDPOINT_URL=http://localhost:4566 AWS_ENDPOINT_URL_S3=http://localhost:4566 && cd infrastructure && npm run deploy:local
 
@@ -94,6 +97,17 @@ build-layer:
 	@echo "Building Lambda layer..."
 	@cd lambda-layers && ./build-layer.sh
 
+# Bootstrap CDK for LocalStack (one-time setup)
+bootstrap:
+	@echo "Bootstrapping CDK for LocalStack..."
+	@export AWS_ENDPOINT_URL=http://localhost:4566 AWS_ENDPOINT_URL_S3=http://localhost:4566 && cd infrastructure && npx cdklocal bootstrap aws://000000000000/us-east-1
+
+# Deploy Lambda directly (bypasses CDK asset publishing issues)
+deploy-direct:
+	@echo "Deploying Lambda directly to LocalStack..."
+	@chmod +x scripts/deploy-lambda-direct.sh
+	@./scripts/deploy-lambda-direct.sh
+
 # Check S3 buckets
 s3-list:
 	@echo "S3 Buckets in LocalStack:"
@@ -107,7 +121,7 @@ s3-models:
 # Get API URL
 api-url:
 	@echo "Fetching API Gateway URL..."
-	@API_ID=$$(aws --endpoint-url=http://localhost:4566 apigateway get-rest-apis --query 'items[0].id' --output text 2>/dev/null); \
+	@API_ID=$$(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 apigateway get-rest-apis --query "items[?name=='ML-Inference-API'].id" --output text 2>/dev/null); \
 	if [ -n "$$API_ID" ] && [ "$$API_ID" != "None" ]; then \
 		echo "API URL: http://localhost:4566/restapis/$$API_ID/prod/_user_request_"; \
 	else \
@@ -117,7 +131,7 @@ api-url:
 # Quick health check
 health:
 	@echo "Checking API health..."
-	@API_ID=$$(aws --endpoint-url=http://localhost:4566 apigateway get-rest-apis --query 'items[0].id' --output text 2>/dev/null); \
+	@API_ID=$$(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 apigateway get-rest-apis --query "items[?name=='ML-Inference-API'].id" --output text 2>/dev/null); \
 	if [ -n "$$API_ID" ] && [ "$$API_ID" != "None" ]; then \
 		curl -s http://localhost:4566/restapis/$$API_ID/prod/_user_request_/health | python3 -m json.tool; \
 	else \

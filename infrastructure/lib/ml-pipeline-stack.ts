@@ -19,17 +19,30 @@ export class MLPipelineStack extends cdk.Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
     });
 
-    // Lambda function for model inference using Docker image
-    // This approach packages all dependencies (Python 3.9 + ML libs) in the container
-    const inferenceLambda = new lambda.DockerImageFunction(this, 'InferenceFunction', {
+    // Lambda Layer for ML dependencies (scikit-learn, pandas, numpy, joblib)
+    const mlDependenciesLayer = new lambda.LayerVersion(this, 'MLDependenciesLayer', {
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../lambda-layers/ml-dependencies')),
+      compatibleRuntimes: [lambda.Runtime.PYTHON_3_9, lambda.Runtime.PYTHON_3_10, lambda.Runtime.PYTHON_3_11],
+      description: 'ML dependencies: scikit-learn, pandas, numpy, joblib, boto3',
+    });
+
+    // Lambda function for model inference
+    // Simple Lambda function that uses a Layer for ML dependencies
+    const inferenceLambda = new lambda.Function(this, 'InferenceFunction', {
       functionName: 'ml-inference',
-      code: lambda.DockerImageCode.fromImageAsset(path.join(__dirname, '../../src/lambda')),
+      runtime: lambda.Runtime.PYTHON_3_9,
+      handler: 'inference.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../../src/lambda')),
+      layers: [mlDependenciesLayer],
       timeout: cdk.Duration.seconds(30),
       memorySize: 512,
       environment: {
         MODEL_BUCKET: modelBucket.bucketName,
         MODEL_KEY: 'models/house_price_random_forest_model.joblib',
         SCALER_KEY: 'models/scaler.joblib',
+        // For LocalStack support
+        AWS_ENDPOINT_URL: process.env.AWS_ENDPOINT_URL || '',
+        AWS_ENDPOINT_URL_S3: process.env.AWS_ENDPOINT_URL_S3 || '',
       },
     });
 
