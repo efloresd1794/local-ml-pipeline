@@ -5,9 +5,6 @@ __pycache__/
 # C extensions
 *.so
 
-CLAUDE.md
-README.localstack.md
-
 # Distribution / packaging
 .Python
 build/
@@ -206,11 +203,26 @@ data/processed/*.parquet
 # Logs
 logs/
 *.log
+logs.txt
 
 # Temporary files
 *.tmp
 *.temp
 .cache/
+
+# Screenshots and images in root (keep organized ones in demo/ or docs/)
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
+/*.svg
+
+# CDK artifacts
+bootstrap-version.json
+
+# Deployment packages
+*.zip
+lambda-deployment.zip
 
 # Database
 *.db
