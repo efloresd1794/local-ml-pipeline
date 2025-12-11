@@ -1,0 +1,4 @@
+(venv) edsonflores@Edsons-Mac-mini local-ml-pipeline % make s3-list
+S3 Buckets in LocalStack:
+Unable to locate credentials. You can configure credentials by running "aws configure".
+make: *** [s3-list] Error 255

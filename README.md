@@ -109,8 +109,7 @@ local-ml-pipeline/
 ├── 📄 requirements.txt                # Python dependencies
 ├── 📄 setup.py                        # Package configuration
 ├── 📄 CLAUDE.md                       # Development guide for Claude Code
-├── 📄 README.md                       # This file
-└── 📄 README.localstack.md            # Detailed LocalStack documentation
+└── 📄 README.md                       # This file
 ```
 
 ## 🚀 **Quick Start**

@@ -1,0 +1,1221 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MLPipelineStack Snapshot Testing stack matches snapshot 1`] = `
+{
+  "Mappings": {
+    "LatestNodeRuntimeMap": {
+      "af-south-1": {
+        "value": "nodejs20.x",
+      },
+      "ap-east-1": {
+        "value": "nodejs20.x",
+      },
+      "ap-northeast-1": {
+        "value": "nodejs20.x",
+      },
+      "ap-northeast-2": {
+        "value": "nodejs20.x",
+      },
+      "ap-northeast-3": {
+        "value": "nodejs20.x",
+      },
+      "ap-south-1": {
+        "value": "nodejs20.x",
+      },
+      "ap-south-2": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-1": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-2": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-3": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-4": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-5": {
+        "value": "nodejs20.x",
+      },
+      "ap-southeast-7": {
+        "value": "nodejs20.x",
+      },
+      "ca-central-1": {
+        "value": "nodejs20.x",
+      },
+      "ca-west-1": {
+        "value": "nodejs20.x",
+      },
+      "cn-north-1": {
+        "value": "nodejs18.x",
+      },
+      "cn-northwest-1": {
+        "value": "nodejs18.x",
+      },
+      "eu-central-1": {
+        "value": "nodejs20.x",
+      },
+      "eu-central-2": {
+        "value": "nodejs20.x",
+      },
+      "eu-isoe-west-1": {
+        "value": "nodejs18.x",
+      },
+      "eu-north-1": {
+        "value": "nodejs20.x",
+      },
+      "eu-south-1": {
+        "value": "nodejs20.x",
+      },
+      "eu-south-2": {
+        "value": "nodejs20.x",
+      },
+      "eu-west-1": {
+        "value": "nodejs20.x",
+      },
+      "eu-west-2": {
+        "value": "nodejs20.x",
+      },
+      "eu-west-3": {
+        "value": "nodejs20.x",
+      },
+      "il-central-1": {
+        "value": "nodejs20.x",
+      },
+      "me-central-1": {
+        "value": "nodejs20.x",
+      },
+      "me-south-1": {
+        "value": "nodejs20.x",
+      },
+      "mx-central-1": {
+        "value": "nodejs20.x",
+      },
+      "sa-east-1": {
+        "value": "nodejs20.x",
+      },
+      "us-east-1": {
+        "value": "nodejs20.x",
+      },
+      "us-east-2": {
+        "value": "nodejs20.x",
+      },
+      "us-gov-east-1": {
+        "value": "nodejs18.x",
+      },
+      "us-gov-west-1": {
+        "value": "nodejs18.x",
+      },
+      "us-iso-east-1": {
+        "value": "nodejs18.x",
+      },
+      "us-iso-west-1": {
+        "value": "nodejs18.x",
+      },
+      "us-isob-east-1": {
+        "value": "nodejs18.x",
+      },
+      "us-west-1": {
+        "value": "nodejs20.x",
+      },
+      "us-west-2": {
+        "value": "nodejs20.x",
+      },
+    },
+  },
+  "Outputs": {
+    "ApiGatewayId": {
+      "Description": "API Gateway REST API ID",
+      "Export": {
+        "Name": "MLApiGatewayId",
+      },
+      "Value": {
+        "Ref": "MLInferenceAPI1622609F",
+      },
+    },
+    "ApiGatewayUrl": {
+      "Description": "API Gateway endpoint URL",
+      "Export": {
+        "Name": "MLApiGatewayUrl",
+      },
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "MLInferenceAPI1622609F",
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            {
+              "Ref": "MLInferenceAPIDeploymentStageprod21574774",
+            },
+            "/",
+          ],
+        ],
+      },
+    },
+    "InferenceLambdaArn": {
+      "Description": "ARN of the inference Lambda function",
+      "Export": {
+        "Name": "MLInferenceLambdaArn",
+      },
+      "Value": {
+        "Fn::GetAtt": [
+          "InferenceFunction179229EB",
+          "Arn",
+        ],
+      },
+    },
+    "MLInferenceAPIEndpoint84427622": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "MLInferenceAPI1622609F",
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region",
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix",
+            },
+            "/",
+            {
+              "Ref": "MLInferenceAPIDeploymentStageprod21574774",
+            },
+            "/",
+          ],
+        ],
+      },
+    },
+    "ModelBucketName": {
+      "Description": "S3 bucket for ML model artifacts",
+      "Export": {
+        "Name": "MLModelBucketName",
+      },
+      "Value": {
+        "Ref": "ModelArtifactsBucket80ACAD84",
+      },
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+      "DependsOn": [
+        "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+        },
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Lambda function for auto-deleting objects in ",
+              {
+                "Ref": "ModelArtifactsBucket80ACAD84",
+              },
+              " S3 bucket.",
+            ],
+          ],
+        },
+        "Handler": "index.handler",
+        "MemorySize": 128,
+        "Role": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+            "Arn",
+          ],
+        },
+        "Runtime": {
+          "Fn::FindInMap": [
+            "LatestNodeRuntimeMap",
+            {
+              "Ref": "AWS::Region",
+            },
+            "value",
+          ],
+        },
+        "Timeout": 900,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Sub": "arn:\${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "InferenceFunction179229EB": {
+      "DependsOn": [
+        "InferenceFunctionServiceRoleDefaultPolicy3908DADA",
+        "InferenceFunctionServiceRoleF5654FD2",
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "17a3843a7d91c2e8029e2ae76342c101ffebcdaaab279e0bc3bb2df9bd6180a9.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "AWS_ENDPOINT_URL": "",
+            "AWS_ENDPOINT_URL_S3": "",
+            "MODEL_BUCKET": {
+              "Ref": "ModelArtifactsBucket80ACAD84",
+            },
+            "MODEL_KEY": "models/house_price_random_forest_model.joblib",
+            "SCALER_KEY": "models/scaler.joblib",
+          },
+        },
+        "FunctionName": "ml-inference",
+        "Handler": "inference.handler",
+        "Layers": [
+          {
+            "Ref": "MLDependenciesLayerFCF0EB5F",
+          },
+        ],
+        "MemorySize": 512,
+        "Role": {
+          "Fn::GetAtt": [
+            "InferenceFunctionServiceRoleF5654FD2",
+            "Arn",
+          ],
+        },
+        "Runtime": "python3.9",
+        "Timeout": 30,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "InferenceFunctionServiceRoleDefaultPolicy3908DADA": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*",
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ModelArtifactsBucket80ACAD84",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ModelArtifactsBucket80ACAD84",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "InferenceFunctionServiceRoleDefaultPolicy3908DADA",
+        "Roles": [
+          {
+            "Ref": "InferenceFunctionServiceRoleF5654FD2",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "InferenceFunctionServiceRoleF5654FD2": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MLDependenciesLayerFCF0EB5F": {
+      "Properties": {
+        "CompatibleRuntimes": [
+          "python3.9",
+          "python3.10",
+          "python3.11",
+        ],
+        "Content": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "c56b25e9f9214310bcac629f152edb269b88eb3b74caa7dc23d4ac83a78008cd.zip",
+        },
+        "Description": "ML dependencies: scikit-learn, pandas, numpy, joblib, boto3",
+      },
+      "Type": "AWS::Lambda::LayerVersion",
+    },
+    "MLInferenceAPI1622609F": {
+      "Properties": {
+        "Description": "API for ML model inference",
+        "Name": "ML Inference Service",
+      },
+      "Type": "AWS::ApiGateway::RestApi",
+    },
+    "MLInferenceAPIAccount7C75C2FD": {
+      "DeletionPolicy": "Retain",
+      "DependsOn": [
+        "MLInferenceAPI1622609F",
+      ],
+      "Properties": {
+        "CloudWatchRoleArn": {
+          "Fn::GetAtt": [
+            "MLInferenceAPICloudWatchRoleA709FB39",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ApiGateway::Account",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "MLInferenceAPICloudWatchRoleA709FB39": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "apigateway.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "MLInferenceAPIDeploymentBF31C7047125754f5d58a9b8e7a7c859a6ed03a0": {
+      "DependsOn": [
+        "MLInferenceAPIhealthGET00F797A8",
+        "MLInferenceAPIhealthOPTIONS5EF010F7",
+        "MLInferenceAPIhealthCE7363F7",
+        "MLInferenceAPIOPTIONS967B372F",
+        "MLInferenceAPIpredictconfidenceOPTIONSDD36FD3C",
+        "MLInferenceAPIpredictconfidencePOST6B5367E8",
+        "MLInferenceAPIpredictconfidence0996B101",
+        "MLInferenceAPIpredictOPTIONS507F05E6",
+        "MLInferenceAPIpredictPOSTCAAB4922",
+        "MLInferenceAPIpredictA382A521",
+      ],
+      "Properties": {
+        "Description": "API for ML model inference",
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Deployment",
+    },
+    "MLInferenceAPIDeploymentStageprod21574774": {
+      "DependsOn": [
+        "MLInferenceAPIAccount7C75C2FD",
+      ],
+      "Properties": {
+        "DeploymentId": {
+          "Ref": "MLInferenceAPIDeploymentBF31C7047125754f5d58a9b8e7a7c859a6ed03a0",
+        },
+        "MethodSettings": [
+          {
+            "DataTraceEnabled": true,
+            "HttpMethod": "*",
+            "LoggingLevel": "INFO",
+            "ResourcePath": "/*",
+          },
+        ],
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+        "StageName": "prod",
+      },
+      "Type": "AWS::ApiGateway::Stage",
+    },
+    "MLInferenceAPIOPTIONS967B372F": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Fn::GetAtt": [
+            "MLInferenceAPI1622609F",
+            "RootResourceId",
+          ],
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIhealthCE7363F7": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "MLInferenceAPI1622609F",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "health",
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "MLInferenceAPIhealthGET00F797A8": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "GET",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "RequestTemplates": {
+            "application/json": "{ "statusCode": "200" }",
+          },
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "InferenceFunction179229EB",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": {
+          "Ref": "MLInferenceAPIhealthCE7363F7",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIhealthGETApiPermissionTestMLPipelineStackMLInferenceAPIDD5086FFGEThealthBD9A8309": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/",
+              {
+                "Ref": "MLInferenceAPIDeploymentStageprod21574774",
+              },
+              "/GET/health",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "MLInferenceAPIhealthGETApiPermissionTestTestMLPipelineStackMLInferenceAPIDD5086FFGEThealth4DD28420": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/test-invoke-stage/GET/health",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "MLInferenceAPIhealthOPTIONS5EF010F7": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "MLInferenceAPIhealthCE7363F7",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIpredictA382A521": {
+      "Properties": {
+        "ParentId": {
+          "Fn::GetAtt": [
+            "MLInferenceAPI1622609F",
+            "RootResourceId",
+          ],
+        },
+        "PathPart": "predict",
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "MLInferenceAPIpredictOPTIONS507F05E6": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "MLInferenceAPIpredictA382A521",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIpredictPOSTApiPermissionTestMLPipelineStackMLInferenceAPIDD5086FFPOSTpredictA7BC1BEC": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/",
+              {
+                "Ref": "MLInferenceAPIDeploymentStageprod21574774",
+              },
+              "/POST/predict",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "MLInferenceAPIpredictPOSTApiPermissionTestTestMLPipelineStackMLInferenceAPIDD5086FFPOSTpredict4B1B1DC3": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/test-invoke-stage/POST/predict",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "MLInferenceAPIpredictPOSTCAAB4922": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "RequestTemplates": {
+            "application/json": "{ "statusCode": "200" }",
+          },
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "InferenceFunction179229EB",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": {
+          "Ref": "MLInferenceAPIpredictA382A521",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIpredictconfidence0996B101": {
+      "Properties": {
+        "ParentId": {
+          "Ref": "MLInferenceAPIpredictA382A521",
+        },
+        "PathPart": "confidence",
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Resource",
+    },
+    "MLInferenceAPIpredictconfidenceOPTIONSDD36FD3C": {
+      "Properties": {
+        "ApiKeyRequired": false,
+        "AuthorizationType": "NONE",
+        "HttpMethod": "OPTIONS",
+        "Integration": {
+          "IntegrationResponses": [
+            {
+              "ResponseParameters": {
+                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization'",
+                "method.response.header.Access-Control-Allow-Methods": "'POST,OPTIONS'",
+                "method.response.header.Access-Control-Allow-Origin": "'*'",
+              },
+              "StatusCode": "204",
+            },
+          ],
+          "RequestTemplates": {
+            "application/json": "{ statusCode: 200 }",
+          },
+          "Type": "MOCK",
+        },
+        "MethodResponses": [
+          {
+            "ResponseParameters": {
+              "method.response.header.Access-Control-Allow-Headers": true,
+              "method.response.header.Access-Control-Allow-Methods": true,
+              "method.response.header.Access-Control-Allow-Origin": true,
+            },
+            "StatusCode": "204",
+          },
+        ],
+        "ResourceId": {
+          "Ref": "MLInferenceAPIpredictconfidence0996B101",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIpredictconfidencePOST6B5367E8": {
+      "Properties": {
+        "AuthorizationType": "NONE",
+        "HttpMethod": "POST",
+        "Integration": {
+          "IntegrationHttpMethod": "POST",
+          "RequestTemplates": {
+            "application/json": "{ "statusCode": "200" }",
+          },
+          "Type": "AWS_PROXY",
+          "Uri": {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":apigateway:",
+                {
+                  "Ref": "AWS::Region",
+                },
+                ":lambda:path/2015-03-31/functions/",
+                {
+                  "Fn::GetAtt": [
+                    "InferenceFunction179229EB",
+                    "Arn",
+                  ],
+                },
+                "/invocations",
+              ],
+            ],
+          },
+        },
+        "ResourceId": {
+          "Ref": "MLInferenceAPIpredictconfidence0996B101",
+        },
+        "RestApiId": {
+          "Ref": "MLInferenceAPI1622609F",
+        },
+      },
+      "Type": "AWS::ApiGateway::Method",
+    },
+    "MLInferenceAPIpredictconfidencePOSTApiPermissionTestMLPipelineStackMLInferenceAPIDD5086FFPOSTpredictconfidence29939FC2": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/",
+              {
+                "Ref": "MLInferenceAPIDeploymentStageprod21574774",
+              },
+              "/POST/predict/confidence",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "MLInferenceAPIpredictconfidencePOSTApiPermissionTestTestMLPipelineStackMLInferenceAPIDD5086FFPOSTpredictconfidenceEA64ED61": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "InferenceFunction179229EB",
+            "Arn",
+          ],
+        },
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition",
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region",
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId",
+              },
+              ":",
+              {
+                "Ref": "MLInferenceAPI1622609F",
+              },
+              "/test-invoke-stage/POST/predict/confidence",
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "ModelArtifactsBucket80ACAD84": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+        "BucketName": "ml-model-artifacts",
+        "Tags": [
+          {
+            "Key": "aws-cdk:auto-delete-objects",
+            "Value": "true",
+          },
+        ],
+        "VersioningConfiguration": {
+          "Status": "Enabled",
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ModelArtifactsBucketAutoDeleteObjectsCustomResource490697F4": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "ModelArtifactsBucketPolicy956A70CB",
+      ],
+      "Properties": {
+        "BucketName": {
+          "Ref": "ModelArtifactsBucket80ACAD84",
+        },
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "Custom::S3AutoDeleteObjects",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "ModelArtifactsBucketPolicy956A70CB": {
+      "Properties": {
+        "Bucket": {
+          "Ref": "ModelArtifactsBucket80ACAD84",
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:PutBucketPolicy",
+                "s3:GetBucket*",
+                "s3:List*",
+                "s3:DeleteObject*",
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": [
+                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                    "Arn",
+                  ],
+                },
+              },
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "ModelArtifactsBucket80ACAD84",
+                    "Arn",
+                  ],
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "ModelArtifactsBucket80ACAD84",
+                          "Arn",
+                        ],
+                      },
+                      "/*",
+                    ],
+                  ],
+                },
+              ],
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::S3::BucketPolicy",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

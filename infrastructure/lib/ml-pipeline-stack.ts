@@ -80,7 +80,13 @@ export class MLPipelineStack extends cdk.Stack {
     predict.addMethod('POST', lambdaIntegration);
 
     // POST /predict/confidence - Prediction with confidence interval
-    const confidence = predict.addResource('confidence');
+    const confidence = predict.addResource('confidence', {
+      defaultCorsPreflightOptions: {
+        allowOrigins: apigateway.Cors.ALL_ORIGINS,
+        allowMethods: ['POST', 'OPTIONS'],
+        allowHeaders: ['Content-Type', 'Authorization'],
+      },
+    });
     confidence.addMethod('POST', lambdaIntegration);
 
     // Outputs

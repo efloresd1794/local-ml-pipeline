@@ -18,7 +18,15 @@ help:
 	@echo "  make deploy          - Deploy infrastructure to LocalStack (CDK)"
 	@echo "  make deploy-direct   - Deploy Lambda directly (bypasses CDK issues) ⭐"
 	@echo "  make deploy-all      - Full deployment (data + train + deploy)"
-	@echo "  make test            - Test the API"
+	@echo ""
+	@echo "Testing:"
+	@echo "  make test                    - Run all tests (unit + integration)"
+	@echo "  make test-unit               - Run all unit tests (FastAPI + Lambda)"
+	@echo "  make test-fastapi            - Run FastAPI unit tests only"
+	@echo "  make test-lambda-unit        - Run Lambda unit tests only"
+	@echo "  make test-lambda-integration - Run Lambda integration tests only"
+	@echo "  make test-cdk                - Run CDK infrastructure tests"
+	@echo ""
 	@echo "  make web             - Start web GUI (http://localhost:8080)"
 	@echo "  make clean           - Clean up containers and data"
 	@echo "  make logs            - View LocalStack logs"
@@ -33,7 +41,7 @@ setup:
 # Start LocalStack
 start-localstack:
 	@echo "Starting LocalStack..."
-	@docker-compose -f docker-compose.localstack.yml up -d
+	@docker-compose -f docker/docker-compose.localstack.yml up -d
 	@echo "Waiting for LocalStack to be ready..."
 	@sleep 5
 	@echo "LocalStack started!"
@@ -41,7 +49,7 @@ start-localstack:
 # Stop LocalStack
 stop-localstack:
 	@echo "Stopping LocalStack..."
-	@docker-compose -f docker-compose.localstack.yml down
+	@docker-compose -f docker/docker-compose.localstack.yml down
 
 # Check status
 status:
@@ -74,8 +82,46 @@ deploy-all:
 
 # Test API
 test:
-	@echo "Testing API..."
-	@. venv/bin/activate && python scripts/test-api.py
+	@echo "Running all tests..."
+	@echo ""
+	@echo "=== FastAPI Unit Tests ==="
+	@. venv/bin/activate && pytest tests/test_fastapi.py -v || true
+	@echo ""
+	@echo "=== Lambda Unit Tests ==="
+	@. venv/bin/activate && pytest tests/test_lambda_unit.py -v || true
+	@echo ""
+	@echo "=== Lambda Integration Tests ==="
+	@. venv/bin/activate && python tests/test_lambda.py
+
+# Run only unit tests (FastAPI + Lambda)
+test-unit:
+	@echo "Running all unit tests..."
+	@echo ""
+	@echo "=== FastAPI Unit Tests ==="
+	@. venv/bin/activate && pytest tests/test_fastapi.py -v
+	@echo ""
+	@echo "=== Lambda Unit Tests ==="
+	@. venv/bin/activate && pytest tests/test_lambda_unit.py -v
+
+# Run only FastAPI unit tests
+test-fastapi:
+	@echo "Running FastAPI unit tests..."
+	@. venv/bin/activate && pytest tests/test_fastapi.py -v
+
+# Run only Lambda unit tests
+test-lambda-unit:
+	@echo "Running Lambda unit tests..."
+	@. venv/bin/activate && pytest tests/test_lambda_unit.py -v
+
+# Run only Lambda integration tests
+test-lambda-integration:
+	@echo "Running Lambda integration tests..."
+	@. venv/bin/activate && python tests/test_lambda.py
+
+# Run CDK infrastructure tests
+test-cdk:
+	@echo "Running CDK infrastructure tests..."
+	@cd infrastructure && npm test
 
 # View logs
 logs:
@@ -111,12 +157,12 @@ deploy-direct:
 # Check S3 buckets
 s3-list:
 	@echo "S3 Buckets in LocalStack:"
-	@aws --endpoint-url=http://localhost:4566 s3 ls
+	@AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 ls
 
 # List models in S3
 s3-models:
 	@echo "Models in S3:"
-	@aws --endpoint-url=http://localhost:4566 s3 ls s3://ml-model-artifacts/models/ || echo "No models found"
+	@AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 ls s3://ml-model-artifacts/models/ || echo "No models found"
 
 # Get API URL
 api-url:

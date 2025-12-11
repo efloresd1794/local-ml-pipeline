@@ -239,8 +239,23 @@ if [ -z "$PREDICT_RESOURCE_ID" ] || [ "$PREDICT_RESOURCE_ID" == "None" ]; then
         --output text)
 fi
 
-# Add methods (GET /health, POST /predict) with CORS support
-for RESOURCE in "${HEALTH_RESOURCE_ID}:GET" "${PREDICT_RESOURCE_ID}:POST"; do
+# Create /predict/confidence resource
+CONFIDENCE_RESOURCE_ID=$(aws --endpoint-url="${ENDPOINT}" apigateway get-resources \
+    --rest-api-id "${API_ID}" \
+    --query "items[?path=='/predict/confidence'].id" \
+    --output text 2>/dev/null || echo "")
+
+if [ -z "$CONFIDENCE_RESOURCE_ID" ] || [ "$CONFIDENCE_RESOURCE_ID" == "None" ]; then
+    CONFIDENCE_RESOURCE_ID=$(aws --endpoint-url="${ENDPOINT}" apigateway create-resource \
+        --rest-api-id "${API_ID}" \
+        --parent-id "${PREDICT_RESOURCE_ID}" \
+        --path-part "confidence" \
+        --query 'id' \
+        --output text)
+fi
+
+# Add methods (GET /health, POST /predict, POST /predict/confidence) with CORS support
+for RESOURCE in "${HEALTH_RESOURCE_ID}:GET" "${PREDICT_RESOURCE_ID}:POST" "${CONFIDENCE_RESOURCE_ID}:POST"; do
     RESOURCE_ID=$(echo "$RESOURCE" | cut -d: -f1)
     METHOD=$(echo "$RESOURCE" | cut -d: -f2)
 
@@ -306,7 +321,12 @@ echo "   ${ENDPOINT}/restapis/${API_ID}/prod/_user_request_"
 echo ""
 echo "Test endpoints:"
 echo "   Health: curl ${ENDPOINT}/restapis/${API_ID}/prod/_user_request_/health"
+echo ""
 echo "   Predict: curl -X POST ${ENDPOINT}/restapis/${API_ID}/prod/_user_request_/predict \\"
+echo "            -H 'Content-Type: application/json' \\"
+echo "            -d '{\"features\": [8.3252, 41.0, 6.984, 1.024, 322.0, 2.555, 37.88, -122.23]}'"
+echo ""
+echo "   Confidence: curl -X POST ${ENDPOINT}/restapis/${API_ID}/prod/_user_request_/predict/confidence \\"
 echo "            -H 'Content-Type: application/json' \\"
 echo "            -d '{\"features\": [8.3252, 41.0, 6.984, 1.024, 322.0, 2.555, 37.88, -122.23]}'"
 echo ""

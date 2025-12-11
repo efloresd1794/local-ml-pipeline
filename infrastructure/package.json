@@ -6,6 +6,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "cdk": "cdk",
     "deploy": "cdk deploy --require-approval never",
     "deploy:local": "cdklocal deploy --require-approval never",
@@ -25,11 +28,14 @@
   "author": "Edson Flores",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^29.5.14",
     "@types/node": "^24.10.1",
     "aws-cdk": "^2.170.0",
     "aws-cdk-lib": "^2.170.0",
     "constructs": "^10.4.3",
+    "jest": "^29.7.0",
     "source-map-support": "^0.5.21",
+    "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
